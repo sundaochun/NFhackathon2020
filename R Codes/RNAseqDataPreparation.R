@@ -37,15 +37,10 @@ mads=apply(datExpr,2,mad)
 hist(mads)
 
 datExpr.test<-datExpr[,mads>1000]
-write.table(t(datExpr.test),"NTAP.5pnf.filtered.txt", quote = FALSE, sep = "\t")
+#write.table(t(datExpr.test),"NTAP.5pnf.filtered.txt", quote = FALSE, sep = "\t")
 
-#"GSE41747_expVal.tsv" is downloaded from synapse with ID:syn6130081  
-#"GSE41747_phenotype_data.tsv" is downloaded from synapse with ID: syn6130082
-GEO<-read.table("GSE41747_expVal.tsv", header=TRUE,row.names=1,stringsAsFactors = FALSE,sep="\t")
-GEOanno<-read.table("GSE41747_phenotype_data.tsv",header = TRUE,stringsAsFactors = FALSE,sep = "\t")
-
-GEO.HU<-GEO[,GEOanno$tissue=="pNF"]
-GEO.MU<-GEO[,GEOanno$tissue=="Mouse neurofibroma"]
-
-write.table(GEO.HU,"GEO41747.HU.pNF.txt",quote=FALSE,sep = "\t")
+GSE41747 <- synGet("syn6130081")
+GEO<-read.table(GSE41747$path, header=TRUE,row.names=1,stringsAsFactors = FALSE,sep="\t")
+GEO.HU<-GEO[,17:29] # sample 17 to 29 are plexiform neurofibromas
+#write.table(GEO.HU,"GSE41747.HU.pNF.txt",quote=FALSE,sep = "\t")
 
