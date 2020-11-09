@@ -81,7 +81,27 @@ To rank the candidates, with the consideration of the above steps, we added the 
 
 #### 3. What the next steps to select the candidate drugs for the best potentials for preclinical study?
 * Weighted toxicity scores of the drugs under or evaluated by the clinical trials can be integrated into the ranking.
-* FDA drug label database can be used to consider the combination of different FDA approved drugs to reduce the potential toxicities and side-effects. 
+* FDA drug label database can## Conclusion/Discussion:
+* Preserved consensus gene regulatory networks exist in PN cells and primary tumors.
+* Drug responses among the cell lines can be used to generate unique patterns/fingerprints related to the biological functions
+* GO similarities between the network eigengenes and drug targets can refine the biology mechanisms, especially for the new drugs with unknown targets.
+* A list of candidates was provided, and the top one candidate has been verified clinically. 
+
+### Additional Questions:
+#### 1. More available transcriptome data of cell lines used in screening will enhance the prediction significantly. The immortalized normal Schwann cells may help to shrink down the candidates further, but the proliferation features of those cells limit this application. 
+
+#### 2. The genetic information such as Exome and SNP data were not used in the current analysis because 1) there are limited numbers of the data in PN to statistically significant, 2) the PN has been reported to have loan mutation burdens, suggesting the individual mutations or SNP may not significantly influence the drug responses, 3) the principle of this analysis is to identify the preserved networks among both cell lines and tumors, which decreases the weight of gene mutations but doesn't mean the mutations are not important in drug responses, and it can be tackle given more time. 
+
+#### 3. What the next steps to select the candidate drugs for the best potentials for preclinical study?
+* Weighted toxicity scores of the drugs under or evaluated by the clinical trials can be integrated into the ranking.
+* FDA drug label database can be used to consider the combination of different FDA approved drugs to reduce the potential toxicities and side effects. 
+
+#### 4. Reproduction: 
+* PN cell line transcriptomes and drug responses data are provided by NFhackathon2020 and downloaded from Synapse. Extra approval may be required to access the data.
+* "GSE41747_expVal.tsv" is downloaded from Synapse with ID:syn6130081 and "GSE41747_phenotype_data.tsv" is downloaded from Synapse with ID: syn6130082.
+* The code for RNAseq data preparation and analysis can be found in /R Codes/RNAseqDataPreparation.R
+* The code for Step2~6 can be found in /R Codes/DrugCandidates.R
+ be used to consider the combination of different FDA approved drugs to reduce the potential toxicities and side-effects. 
 
 #### 4. Reproduction: 
 * PN cell line transcriptomes and drug responses data are provided by NFhackathon2020 and downloaded from Synapse. Extra approval may be required to access the data.
