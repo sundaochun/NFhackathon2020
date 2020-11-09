@@ -1,2 +1,2 @@
 # NFhackathon2020
-![logo!](Capture.jpg "Logo")
+![logo!](/Capture.JPG "Logo")
