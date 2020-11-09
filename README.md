@@ -33,7 +33,7 @@ Our approach involved the following steps:
 6. Rank the drug candidates considering the responses, correlation with the preserved networks, and known drug targets/mechanisms
 
 ### Step 1: Dataset trimming and preparation 
-Transcriptomes from both PN cell lines (NTAP) and primary PN tissue (GEO41747) should be fit the "Scale free topology model" and reach the model score >0.8.   
+Transcriptomes from both PN cell lines (NTAP) and primary PN tissue (GEO41747) should be fit the "Scale free topology model" and reach the model fit score >0.8.   
 ![ScaleFree!](/images/ScaleFreeTopologyModelFit.JPG  "ScaleFree")
 
 
