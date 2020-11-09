@@ -21,10 +21,9 @@ set.seed('99999')  #set seed for reproducibility
 
 #######################
 #Start analysis 
-setwd("~/NFhackathom2020/input")
 
-NTAP.5pnf<-read.table("NTAP.5pnf.filtered.txt",header = TRUE,stringsAsFactors = FALSE,row.names = 1,sep="\t")
-GEO41747.pNF<-read.table("GEO41747.HU.pNF.txt",header = TRUE,stringsAsFactors = FALSE, row.names = 1,sep="\t")
+NTAP.5pnf<-datExpr.test
+GEO41747.pNF<- GEO.HU
 
 pNF.merged<-merge(NTAP.5pnf, GEO41747.pNF, by=0, all=FALSE)
 rownames(pNF.merged)<-pNF.merged$Row.names
