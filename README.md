@@ -50,7 +50,7 @@ Pearson correlations were calculated between the eigengene of preserved networks
 ![Correlations drug&networks!](/images/CorrelationDrug&Networks.JPG "Correlations drug&networks")
 
 ### Step 4: Define the drug clusters according to the pattern of correlations among drugs and networks.
-A further unsupervised clustering on the column was done to group the drugs with similar pattern, which is assumed to have similar biology in PN cells. For those chemicals has unknown targets, the results will provide insights to demonstrate their potential targets or targeted networks according to the well-studied chemicals with the similar pattern (drug fingerprints) in the group. The Seven durg clusters were defined according to the patterns. In the heatmap, each row is preserved regulatory networks and each column is a drug in the screen.
+A further unsupervised clustering on the column was done to group the drugs with similar pattern, which is assumed to have similar biology in PN cells. For those chemicals has unknown targets, the results will provide insights to demonstrate their potential targets or targeted networks according to the well-studied chemicals with the similar pattern (drug fingerprints) in the group. The six durg clusters were defined according to the patterns. In the heatmap, each row is preserved regulatory networks and each column is a drug in the screen.
 
 ![Pattern drug&networks!](/images/ModuleDrugResponsetCorrelation.jpg "Pattern drug&networks")
 
