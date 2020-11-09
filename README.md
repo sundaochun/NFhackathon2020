@@ -36,4 +36,51 @@ Our approach involved the following steps:
 Transcriptomes from both PN cell lines (NTAP) and primary PN tissue (GEO41747) should be fit the "Scale free topology model" and reach the model fit score >0.8.   
 ![ScaleFree!](/images/ScaleFreeTopologyModelFit.JPG  "ScaleFree")
 
+### Step 2: Define the preserved consensus networks between PN cell lines and PN tissue
+The discrepancy between in vivo and in vitro systems is expected. Considering the intertumoral heterogeneity among cells, we should narrow down the drug targets to the conserved gene regulatory network. WGCNA package is used to find the networks and define the eigengenes of each network in PN cell lines (NTAP), PN primary tumor (GEO41747), and the preserved ones shared by these two models.
 
+![NTAP eigenene!](/images/EigengeneNetwork_NTAP.jpg "NTAP eigengene")
+![GEO eigenene!](/images/EigengeneNetwork_GEO41747.jpg "GEO eigengene")
+![Preserved networks!](/images/PreservedNetworks.jpg "Preserved networks")
+The color blocks on the x-axis and y-axis of the heatmaps represent the different shared consensus gene networks.
+
+### Step 3: Correlate the drug responses (AUC_Simpson) and eigengene expression of regulatory networks.
+Pearson correlations were calculated between the eigengene of preserved networks and the drug responses among the 5 PN cell lines that have the RNAseq data. A part of result is demonstrated below. Each row is preserved regulatory networks and each column is a drug in the screen. To narrow down the candidates, the arbitrary cutoff of median_response<50 was used, and can be modified accordingly. The results provide the unique "fingerprint" of each drug in the screen.
+
+![Correlations drug&networks!](/images/CorrelationDrug&Networks.JPG "Correlations drug&networks")
+
+### Step 4: Define the drug clusters according to the pattern of correlations among drugs and networks.
+A further unsupervised clustering on the column was done to group the drugs with similar pattern, which is assumed to have similar biology in PN cells. For those chemicals has unknown targets, the results will provide insights to demonstrate their potential targets or targeted networks according to the well-studied chemicals with the similar pattern (drug fingerprints) in the group. The Seven durg clusters were defined according to the patterns. In the heatmap, each row is preserved regulatory networks and each column is a drug in the screen.
+
+![Pattern drug&networks!](/images/ModuleDrugResponsetCorrelation.jpg "Pattern drug&networks")
+
+### Step 5: Analyze GO of the genes in networks and the known drug targeted genes in drug clusters, and score the similarity according to the GO semantic analysis.
+With the gene ontology annotations, the enriched GO terms within each of the preserved networks were determined. With the drug annotations from the hackathon2020, drugs with known target genes were also analyzed for enriched GO terms. Within each of the three major branches of GO, Molecular Function (MF), Biology Process (BP), and Cell Component (CC), the semantic distances (similarity) among the GO of regulatory networks and GO of drug clusters were calculated. 
+
+The correlation heatmap under the MF branch is demonstrated below. We can see the drug clusters are similar among themselves, partially because that current drug design is to commonly target functional kinases or growth factor receptors. Interestingly, we also observe the similarities between drug clusters and preserved networks, which provides a new layer of insight for the drug mechanisms. Furthermore, the similarity will enhance or verify the biology of the drugs. With the further characterization of the biology of the preserved networks, drugs strongly correlated with distinct functional networks can be used in combination to enhance the inhibitory effects or reduce the toxicities in preclinical studies. Here, to narrow down the candidates, only the similary value more than 0.8 in any of the three GO branches will be used for next step.
+
+![GOsimilarity.MF!](/images/DrugTargets&PresevedNetwork.GOsimilarity.MF.jpg "GOsimilarity.MF")
+![GOsimilarity.MF.score!](/images/DrugNetworkScores.jpg "GOsimilarity.score.MF")
+
+### Step 6: Rank the drug candidates considering the responses, correlation with the preserved networks, and known drug targets/mechanisms
+To rank the candidates, with the consideration of the above steps, we added the weight to the drugs with known targets that the more targets the drug has, the higher it may rank. We did so because the drugs with known targets were relatively well-studied and even approved by the FDA in different diseases, making the potential toxicity, preclinical experiment design, and mechanism studies more efficient. The code is also easy to be tweaked to prioritize the new drug candidates, and our analysis in Step 3,4 and 5 will extraordinarily helpful for the identification of potential targeted genes or networks. The top 10 candidates are shown below. Surprisingly, the sunitinib ranks the first, which is the first approved drug for PN by FDA this year.
+
+![Top10Rank!](/images/Rank.jpg "Top10Rank")
+
+
+## Conclusion/Discussion:
+* Preserved consensus gene regulatory networks exist in PN cells and primary tumors.
+* Drug responses among the cell lines can be used to generate unique patterns/fingerprints related to the biological functions
+* GO similarities between the network eigengenes and drug targets can be used to refine the biology mechanisms, especially for the new drugs with unknow targets.
+* A list of candidates were provided and the top one candidate has been verified clincally. 
+
+### Additional Questions:
+#### 1. More available transcriptome data of cell lines used in screening with significantly enhance the predictions. The immortalized normal Schwann cells may help to further shrink down the candidates, but the proliferation features of those cells limit this application. 
+
+#### 2. The genetic information such as Exom and SNP data were not used in the current analysis because 1) there are limited numbers of the data in PN to statistically significant, 2) the PN has been reported to have loan mutation burdons, suggesting the individual mutations or SNP may not significantly influcence the drug responses, 3) the pricinple of this analysis is to identify the preserved networks among both cell lines and tumors, which decreases the weight of gene mutations but doesn't mean the mutations are not important in drug responses, and it can be tackle given more time. 
+
+#### 3. What the next steps to select the candidate drugs for the best potentials for preclinical study?
+* Weighted toxicity scores of the drugs under or evaluated by the clinical trials can be integrated into the ranking.
+* FDA drug label database can be used to consider the combination of different FDA approved drugs to reduce the potential toxicities and side-effects. 
+
+#### 4. Analysis reproduction: 
