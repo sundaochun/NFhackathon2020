@@ -88,3 +88,4 @@ To rank the candidates, with the consideration of the above steps, we added the 
 * "GSE41747_expVal.tsv" is downloaded from Synapse with ID:syn6130081 and "GSE41747_phenotype_data.tsv" is downloaded from Synapse with ID: syn6130082.
 * The code for RNAseq data preparation and analysis can be found in /R Codes/RNAseqDataPreparation.R
 * The code for Step2~6 can be found in /R Codes/DrugCandidates.R
+* This the first time for my to join Hackathon and share codes through Github. Please provide feedback and I will improve. 
