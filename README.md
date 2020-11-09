@@ -83,4 +83,8 @@ To rank the candidates, with the consideration of the above steps, we added the 
 * Weighted toxicity scores of the drugs under or evaluated by the clinical trials can be integrated into the ranking.
 * FDA drug label database can be used to consider the combination of different FDA approved drugs to reduce the potential toxicities and side-effects. 
 
-#### 4. Analysis reproduction: 
+#### 4. Reproduction: 
+* PN cell line transcriptomes and drug responses data are provided by NFhackathon2020 and downloaded from Synapse. Extra approval may be required to access the data.
+* "GSE41747_expVal.tsv" is downloaded from Synapse with ID:syn6130081 and "GSE41747_phenotype_data.tsv" is downloaded from Synapse with ID: syn6130082.
+* The code for RNAseq data preparation and analysis can be found in /R Codes/RNAseqDataPreparation.R
+* The code for Step2~6 can be found in /R Codes/DrugCandidates.R
