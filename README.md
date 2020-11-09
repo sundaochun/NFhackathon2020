@@ -34,6 +34,6 @@ Our approach involved the following steps:
 
 ### Step 1: Dataset trimming and preparation 
 Transcriptomes from both PN cell lines (NTAP) and primary PN tissue (GEO41747) should be fit the "Scale free topology model" and reach the model score >0.8.   
-![ScaleFree!](/images/Scale Free Topology Model Fit.JPG  "ScaleFree")
+![ScaleFree!](/images/ScaleFreeTopologyModelFit.JPG  "ScaleFree")
 
 
