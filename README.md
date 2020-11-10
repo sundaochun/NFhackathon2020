@@ -75,7 +75,7 @@ To rank the candidates, with the consideration of the above steps, we added the 
 * A list of candidates was provided, and the top one candidate has been verified clinically. 
 
 ### Additional Questions:
-#### 1. More available transcriptome data of cell lines used in screening will enhance the prediction significantly. The immortalized normal Schwann cells may help to shrink down the candidates further, but the proliferation features of those cells limit this application. 
+#### 1. More available transcriptome data of PN related cell lines used in screening will enhance the prediction of gene regulatory network significantly. One of the immortalized Schwann line with the loss of one NF1 allele were include in the network analysis to increase the sample number. Actually, from the multiple dimension reduction analysis, the transcriptional differences between PN cell lines and "normal" Schwann cells are not dramtically distinct. There is a cell line name discrepancy between the RNAseq data and drug screen data. 
 
 #### 2. The genetic information such as Exome and SNP data were not used in the current analysis because 1) there are limited numbers of the data in PN to statistically significant, 2) the PN has been reported to have loan mutation burdens, suggesting the individual mutations or SNP may not significantly influence the drug responses, 3) the principle of this analysis is to identify the preserved networks among both cell lines and tumors, which decreases the weight of gene mutations but doesn't mean the mutations are not important in drug responses, and it can be tackle given more time. 
 
