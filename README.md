@@ -1,5 +1,5 @@
 # NFhackathon2020
-![logo!](/Capture.JPG "Logo")
+![logo!](/NF-Terminators.jpg "Logo")
 ## Team NFFighters
 
 #Integrated drug target discovery using consensus gene regulation networks and drug response clusters in plexiform neurofibromas 
