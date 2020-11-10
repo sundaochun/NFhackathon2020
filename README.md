@@ -2,7 +2,7 @@
 ![logo!](/images/NF-Terminators.jpg "Logo")
 ## Team NF-Terminators
 
-#Integrated drug discovery using consensus gene regulatory networks and drug response in plexiform neurofibromas 
+#Integrated drug discovery using consensus gene regulatory networks and drug screen in plexiform neurofibromas 
 
 
 ##Abstract
