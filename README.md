@@ -70,22 +70,21 @@ To rank the candidates, with the consideration of the above steps, we added the 
 
 ## Conclusion/Discussion:
 * Preserved consensus gene regulatory networks exist in PN cells and primary tumors.
-* Drug responses among the cell lines can be used to generate unique patterns/fingerprints related to the biological functions
-* GO similarities between the network eigengenes and drug targets can refine the biology mechanisms, especially for the new drugs with unknown targets.
-* A list of candidates was provided, and the top one candidate has been verified clinically. 
+* Drug responses in the cell lines can be used to generate unique patterns/fingerprints related to the biological mechanisms.
+* GO similarities among the networks and drug target clusters can refine the drug mechanisms, especially for the new drugs with unknown targets.
+* A list of candidates was provided, and the top one, SUNITINIB, candidate has been verified clinically. 
 
 ### Additional Questions:
 #### 1. More available transcriptome data of PN related cell lines used in screening will enhance the prediction of gene regulatory network significantly. One of the immortalized Schwann line with the loss of one NF1 allele were include in the network analysis to increase the sample number. Actually, from the multiple dimension reduction analysis, the transcriptional differences between PN cell lines and "normal" Schwann cells are not dramtically distinct. There is a cell line name discrepancy between the RNAseq data and drug screen data. 
 
-#### 2. The genetic information such as Exome and SNP data were not used in the current analysis because 1) there are limited numbers of the data in PN to statistically significant, 2) the PN has been reported to have loan mutation burdens, suggesting the individual mutations or SNP may not significantly influence the drug responses, 3) the principle of this analysis is to identify the preserved networks among both cell lines and tumors, which decreases the weight of gene mutations but doesn't mean the mutations are not important in drug responses, and it can be tackle given more time. 
+#### 2. The genetic information such as Exome and SNP data were not used in the current analysis because 1) there are limited sample numbers in PN to statistically significant, 2) the PN has been reported to have low mutation burdens, suggesting the individual mutation or SNPs may not significantly influence the tumor biology and drug responses, 3) the principle of this analysis is to identify the preserved networks among both cell lines and tumors, which decreases the weight of gene mutations with in each sample. However, it doesn't mean the mutations are not important in drug responses, and it can be tackle given more time and available samples. 
 
 #### 3. What the next steps to select the candidate drugs for the best potentials for preclinical study?
-* Weighted toxicity scores of the drugs under or evaluated by the clinical trials can be integrated into the ranking.
-* FDA drug label database can be used to consider the combination of different FDA approved drugs to reduce the potential toxicities and side effects. 
+* Weighted toxicity scores of the drugs currently under or evaluated by the clinical trials can be integrated into the ranking (PMID: 29739789).
+* Many candidates have been approved by the FDA in other diseases. The FDA drug label database can be used to consider the combination of different FDA approved drugs to reduce the potential toxicities and side effects in future PN preclinical trials. 
 
 #### 4. Reproduction: 
 * PN cell line transcriptomes and drug responses data are provided by NFhackathon2020 and downloaded from Synapse. Extra approval may be required to access the data.
 * "GSE41747_expVal.tsv" is downloaded from Synapse with ID:syn6130081 and "GSE41747_phenotype_data.tsv" is downloaded from Synapse with ID: syn6130082.
-* The code for RNAseq data preparation and analysis can be found in /R Codes/RNAseqDataPreparation.R
-* The code for Step2~6 can be found in /R Codes/DrugCandidates.R
-* This the first time for my to join Hackathon and share codes through Github. Please provide feedback and join the efferts to ending NF.   
+* The R code can be found in /R Codes/DrugCandidates.R 
+* This the first time for my to join Hackathon and share codes through Github. Please provide feedback and join the efforts ending the NF.   
