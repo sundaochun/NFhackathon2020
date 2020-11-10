@@ -22,18 +22,160 @@ set.seed('99999')  #set seed for reproducibility
 #######################
 #Start analysis 
 
-NTAP.5pnf<-datExpr.test
-GEO41747.pNF<- GEO.HU
+library(synapser)
+library(dendextend)
+library(tidyverse) 
+library(synapser)
+library(umap) 
+library(dbscan)
+library(dplyr)
+library(pheatmap)
+library(synapser)
+library(WGCNA)
+library(ggplot2)
+library(ggdendro)
+library(gplots)
+library(biomaRt)
+library(org.Hs.eg.db)
+library(GOSemSim)
 
+
+
+
+
+
+
+
+
+synLogin(email="sundaochun@gmail.com", password="NFhackxon2020")
+set.seed('99999')
+
+############################3
+# Data preparatoin
+pnf_cell_line <- synTableQuery("SELECT * FROM syn22351884")$asDataFrame()  
+table(paste0(pnf_cell_line$specimenID, "_", pnf_cell_line$modelOf))
+
+PNF.tab<-pnf_cell_line %>% dplyr::select(totalCounts,Symbol,zScore,specimenID,sex,tumorType,nf1Genotype,modelOf) %>% unique() %>% dplyr::arrange(specimenID)
+PNF.pdata<-PNF.tab %>% dplyr::select(specimenID,sex,tumorType,nf1Genotype,modelOf) %>% unique()
+rownames(PNF.pdata)<-PNF.pdata[,1]
+table(pnf_cell_line$specimenID)#19098 gene per sample
+
+diffexdata <- PNF.tab%>%dplyr::select(specimenID,Symbol,totalCounts)%>%
+  group_by(specimenID,Symbol,totalCounts)%>%
+  unique()%>%spread(specimenID,totalCounts)
+
+PNF.mx<-data.frame(diffexdata)
+rownames(PNF.mx)<-PNF.mx[,1]
+PNF.mx<-PNF.mx[,-1]
+
+library(Biobase)
+colnames(PNF.mx)[4:5]<-c("ipNF05.5 (mixed clone)","ipNF05.5 (single clone)")
+PNF.pdata<-PNF.tab %>% dplyr::select(specimenID,sex,tumorType,nf1Genotype,modelOf) %>% unique()
+rownames(PNF.pdata)<-PNF.pdata[,1]
+colnames(PNF.mx)==rownames(PNF.pdata)
+PNF.pdata<-new("AnnotatedDataFrame",data=PNF.pdata)
+PNF.eSet<-ExpressionSet(assayData=as.matrix(PNF.mx),phenoData=PNF.pdata,annotation="pnf_RNAseq")	
+
+
+
+#Prepare the drug response data
+drug_data <- synGet("syn20700260")$path %>% read.csv() 
+
+#Seven plexiform neurofibroma related cells were used in the drug screen. 
+CellLines <- c("ipNF05.5 (single clone)", "ipNF06.2A", "ipNF95.11b C/T", "ipnNF95.11C", "ipNF95.6", "ipNF05.5 (mixed clone)", "ipNF95.11b C")
+
+
+drug_data_filt_1 <- drug_data %>% 
+  filter(response_type == "AUC_Simpson") %>% 
+  filter(model_name %in% CellLines) %>% 
+  group_by(drug_screen_id) %>% 
+  filter(n() == 1) %>% 
+  ungroup()
+
+
+drug_data_filt <- drug_data_filt_1 %>% 
+  group_by(DT_explorer_internal_id) %>% 
+  filter(n() > 3) %>% 
+  ungroup() %>% 
+  dplyr::select(DT_explorer_internal_id, response) %>%
+  group_by(DT_explorer_internal_id) %>% 
+  summarize('median_response' = median(response))%>% 
+  ungroup() 
+
+
+drug_data_filt_2 <- drug_data_filt_1 %>% 
+  dplyr::select(drug_name,DT_explorer_internal_id, response) %>%
+  group_by(drug_name) %>% 
+  summarize('median_response' = median(response))%>% 
+  ungroup()   
+
+
+
+#obtain the drug target annotations
+targets <- synGet("syn17091507")$path %>% readRDS() %>% 
+  filter(mean_pchembl > 6) %>% 
+  dplyr::select(internal_id, hugo_gene, std_name) %>% 
+  distinct()
+
+#An abitrary cutoff was set as 50 for median_response, and it can be changed. 
+TraitsOfDrug <- drug_data_filt_1%>%dplyr::select(model_name,drug_name,response)%>%
+  group_by(drug_name)%>%
+  unique()%>%spread(model_name,response)%>%
+  filter(drug_name %in% drug_data_filt_2$drug_name[drug_data_filt_2$median_response<50])  
+
+
+
+############# use DT_explorer_internal_id for durgs
+AnnoDrug <- drug_data_filt_1%>%dplyr::select(DT_explorer_internal_id,drug_name)%>%
+  group_by(DT_explorer_internal_id)%>%unique()
+
+
+NewAnno<- TraitsOfDrug %>% left_join(AnnoDrug, by= c("drug_name"="drug_name"))  
+
+
+finalAnno<- NewAnno %>% left_join(targets, by= c("DT_explorer_internal_id"="internal_id"))%>%
+  dplyr::select(drug_name,DT_explorer_internal_id,hugo_gene,std_name)                   
+
+
+datTraits= data.frame(t(column_to_rownames(TraitsOfDrug,"drug_name")))
+
+#To fix the inconsistent cell line names used in RNAseq and drug screen
+rownames(datTraits)<-c("ipNF05.5 (mixed clone)","ipNF05.5 (single clone)","ipNF06.2A", "ipNF95.11bC","ipNF95.11bC/T", "ipNF95.6","ipnNF95.11c") 
+datTraits<-datTraits[-c(3,5),] # "ipNF06.2A" and "ipNF95.11bC/T" don't have RNAseq data. 
+
+
+#To include the most available data in the RNAseq based network analysis and drug screen,
+#any plexiform neurofibromas related cells, which at least have lost one of the NF1 alleles were used in further analysis regardless the "normal" or "tumor" annotations.
+
+datExpr = as.data.frame(t(exprs(PNF.eSet[,sampleNames(PNF.eSet) %in% c("ipNF05.5 (mixed clone)","ipNF05.5 (single clone)", "ipNF95.11bC", "ipNF95.6", "ipnNF95.11c" )]))) #only 5 tumor lines have drug response data 
+
+mads=apply(datExpr,2,mad)
+hist(mads)
+
+datExpr.test<-datExpr[,mads>1000]
+#write.table(t(datExpr.test),"NTAP.5pnf.filtered.txt", quote = FALSE, sep = "\t")
+
+#download the GSE41747 data set from Synapse 
+GSE41747 <- synGet("syn6130081")
+GEO<-read.table(GSE41747$path, header=TRUE,row.names=1,stringsAsFactors = FALSE,sep="\t")
+GEO.HU<-GEO[,17:29] # sample 17 to 29 are plexiform neurofibromas
+#write.table(GEO.HU,"GSE41747.HU.pNF.txt",quote=FALSE,sep = "\t")
+
+
+NTAP.5pnf<-t(datExpr.test)
+GEO41747.pNF<-GEO.HU
+
+#The shared genes from the two data sets were used for the consensus network analysis
 pNF.merged<-merge(NTAP.5pnf, GEO41747.pNF, by=0, all=FALSE)
 rownames(pNF.merged)<-pNF.merged$Row.names
-
 NTAPm<-pNF.merged[,2:6]
 GEO41747m<-pNF.merged[,7:19]
 
 
 
-setwd("~/NFhackathom2020/output")
+#setwd("~/output")
+
+setwd("/home/rstudio")
 nSets = 2;
 # For easier labeling of plots, create a vector holding descriptive names of the two sets.
 setLabels = c("NTAP", "GEO41747")
@@ -79,13 +221,13 @@ for (set in 1:nSets)
 }
 
 
-pdf(file = "ConsensusSampleClustering.pdf", width = 12, height = 12);
+pdf(file = "ConsensusSampleClustering.pdf", width = 12, height = 12)
 par(mfrow=c(2,1))
 par(mar = c(0, 4, 2, 0))
 for (set in 1:nSets)
   plot(sampleTrees[[set]], main = paste("Sample Consensus clustering on all genes in", setLabels[set]),
-       xlab="", sub="", cex = 0.7);
-dev.off();
+       xlab="", sub="", cex = 0.7)
+dev.off()
 
 
 multiExpr[[2]]$data = multiExpr[[2]]$data[-8, ]#remove GSM1023529 outlier
@@ -214,7 +356,6 @@ plotDendroAndColors(consTree, moduleColors.con,
 
 dev.off()
 
-
 # Recalculate consMEs to give them color names
 consMEsC = multiSetMEs(multiExpr, universalColors = moduleColors.con);
 # We add the weight trait to the eigengenes and order them by consesus hierarchical clustering:
@@ -237,16 +378,6 @@ plotEigengeneNetworks(MET.con, setLabels, letterSubPlots = TRUE,colorLabels = FA
 dev.off() 
 
 
-
-pdf("TwoNK_modules.NTAPvsGEO41747.pdf",height=8,width=12)
-plotDendroAndColors(geneTreeA1, modulesA1, "Modules", dendroLabels=FALSE, hang=0.03, addGuide=TRUE,
-                    guideHang=0.05, main="Gene dendrogram and module colors (NATP)") 
-plotDendroAndColors(geneTreeA2, modulesA1, "Modules", dendroLabels=FALSE, hang=0.03, addGuide=TRUE,
-                    guideHang=0.05, main="Gene dendrogram and module colors (GEO41747)") 
-
-dev.off()
-
-
 #To determine which concensus networks are preserved better between NTAP cell lines and primary pNF tumors from GEO41747
 multiColor.test = list(NTAP=moduleColors.con)
 mp=modulePreservation(multiExpr,multiColor.test,referenceNetworks=1,verbose=3,networkType="signed hybrid",
@@ -259,71 +390,8 @@ write.table(stats.con[order(-stats.con[,2]),c(1:2)],"NetworkConservationBetweenN
 
 
 
-drug_data <- synGet("syn20700260")$path %>% read.csv() 
-head(drug_data)
 
-pnf <- c("ipNF05.5 (single clone)", "ipNF06.2A", "ipNF95.11b C/T", "ipnNF95.11C", "ipNF95.6", "ipNF05.5 (mixed clone)", "ipNF95.11b C")
-
-table(drug_data$response_type)                        
-
-drug_data_filt_1 <- drug_data %>% 
-  filter(response_type == "AUC_Simpson") %>% 
-  filter(model_name %in% pnf) %>% 
-  group_by(drug_screen_id) %>% 
-  filter(n() == 1) %>% 
-  ungroup()
-
-
-drug_data_filt <- drug_data_filt_1 %>% 
-  group_by(DT_explorer_internal_id) %>% 
-  filter(n() > 3) %>% 
-  ungroup() %>% 
-  dplyr::select(DT_explorer_internal_id, response) %>%
-  group_by(DT_explorer_internal_id) %>% 
-  summarize('median_response' = median(response))%>% 
-  ungroup() 
-
-
-
-targets <- synGet("syn17091507")$path %>% readRDS() %>% 
-  filter(mean_pchembl > 6) %>% 
-  dplyr::select(internal_id, hugo_gene, std_name) %>% 
-  distinct()
-
-
-drug_data_filt_2 <- drug_data_filt_1 %>% 
-  dplyr::select(drug_name,DT_explorer_internal_id, response) %>%
-  group_by(drug_name) %>% 
-  summarize('median_response' = median(response))%>% 
-  ungroup()   
-
-#An abitrary cutoff was set as 50 for median_response, and it can be changed. 
-TraitsOfDrug <- drug_data_filt_1%>%dplyr::select(model_name,drug_name,response)%>%
-  group_by(drug_name)%>%
-  unique()%>%spread(model_name,response)%>%
-  filter(drug_name %in% drug_data_filt_2$drug_name[drug_data_filt_2$median_response<50])  
-
-
-
-############# use DT_explorer_internal_id for durgs
-
-AnnoDrug <- drug_data_filt_1%>%dplyr::select(DT_explorer_internal_id,drug_name)%>%
-  group_by(DT_explorer_internal_id)%>%
-  unique()
-
-
-NewAnno<- TraitsOfDrug %>% 
-  left_join(AnnoDrug, by= c("drug_name"="drug_name"))  
-
-
-finalAnno<- NewAnno %>% left_join(targets, by= c("DT_explorer_internal_id"="internal_id"))%>%
-  dplyr::select(drug_name,DT_explorer_internal_id,hugo_gene,std_name)                   
-               
-
-datTraits= data.frame(t(column_to_rownames(TraitsOfDrug,"drug_name")))
-rownames(datTraits)<-c("ipNF05.5 (mixed clone)","ipNF05.5 (single clone)","ipNF06.2A", "ipNF95.11bC","ipNF95.11bC/T", "ipNF95.6","ipnNF95.11c") 
-datTraits<-datTraits[-c(3,5),]
-
+#
 Traits = vector(mode="list", length = nSets)
 Traits[[1]]$data <-datTraits                
 Traits[[2]]$data <-datTraits
@@ -346,33 +414,7 @@ colnames(Color2NKs)[2]<-"NKs"
 
 rownames(moduleTraitCor[[1]])
 
-
-library(RColorBrewer)
-hmcol <- rev(colorRampPalette(c("blue", "white", "red"))(n = 10000))
-DrugDist<-dist(t(moduleTraitCor[[1]]),method = "euclidean")
-DrugHC<-hclust(DrugDist,method = "average")
-
-
-pdf("moduleTraitCor.NTAP.inCon-test_lessdrug.pdf", width = 200, height = 8)
-
-heatmap.2(moduleTraitCor[[1]] 
-          #Rowv=as.dendrogram(generow.hc), 
-          ,Rowv=NULL
-          ,Colv=as.dendrogram(DrugHC)
-          #,Colv=NULL
-          # ,sepwidth=c(0.01,0)
-          # ,sepcolor="white"
-          # ,colsep=1:ncol( )
-          # ,rowsep=1:(nrow())
-          ,main="moduleTraitCor.NTAP.inCon-test_lessdrug"
-          ,cexRow=0.8,cexCol=0.8
-          ,col= rev(hmcol)
-          ,key=TRUE,keysize=1, symkey=TRUE, density.info="none", trace="none",scale="none")	
-dev.off()
-
-
-# Open a suitably sized window 
-sizeGrWindow(10,7)
+#The unclustered heapmap showing the correlation and p values
 pdf(file = "ModuleTraitRelationships-NTAPnew2.pdf", wi = 200, he = 7);
 # Plot the module-trait relationship table for set number 1
 set = 1
@@ -392,6 +434,40 @@ labeledHeatmap(Matrix = moduleTraitCor[[set]],
                main = paste("Module--trait relationships in", setLabels[set]))
 dev.off();
 
+
+
+library(RColorBrewer)
+hmcol <- rev(colorRampPalette(c("blue", "white", "red"))(n = 10000))
+DrugDist<-dist(t(moduleTraitCor[[1]]),method = "euclidean")
+DrugHC<-hclust(DrugDist,method = "average")
+
+#To generate a heatmap showing unsupervise clustering on columns. 
+pdf("moduleTraitCor.NTAP.inCon-test_lessdrug.pdf", width = 200, height = 8)
+
+heatmap.2(moduleTraitCor[[1]] 
+          #Rowv=as.dendrogram(generow.hc), 
+          ,Rowv=NULL
+          ,Colv=as.dendrogram(DrugHC)
+          #,Colv=NULL
+          # ,sepwidth=c(0.01,0)
+          # ,sepcolor="white"
+          # ,colsep=1:ncol( )
+          # ,rowsep=1:(nrow())
+          ,main="moduleTraitCor.NTAP.inCon-test_lessdrug"
+          ,cexRow=0.8,cexCol=0.8
+          ,col= rev(hmcol)
+          ,key=TRUE,keysize=1, symkey=TRUE, density.info="none", trace="none",scale="none")	
+dev.off()
+
+################
+#These are drug_name that define the right boundary of DrugClusters. They are determined manually 
+#based on the heatmaps "moduleTraitCor.NTAP.inCon-test_lessdrug.pdf"
+
+
+dend_data <- dendro_data(DrugHC, type = "rectangle")
+hist(dend_data$segments$x)
+DrugClustDF<-data.frame(dend_data$labels) 
+DrugClustDF$cluster<-"NA"
 
 
 
