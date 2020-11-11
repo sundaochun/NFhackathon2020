@@ -72,7 +72,7 @@ To rank the candidates, with the consideration of the above steps, we added the 
 * Preserved consensus gene regulatory networks exist in PN cells and primary tumors.
 * Drug responses in the cell lines can be used to generate unique patterns/fingerprints related to the biological mechanisms.
 * GO similarities among the networks and drug target clusters can refine the drug mechanisms, especially for the new drugs with unknown targets.
-* A list of candidates was provided, and the top one, SUNITINIB, candidate has been verified clinically. 
+* A list of candidates was provided, and the top one candidate, SUNITINIB, has been verified clinically and approved by FDA at 2020. 
 
 ### Additional Questions:
 #### 1. More available transcriptome data of PN related cell lines used in screening will enhance the prediction of gene regulatory network significantly. One of the immortalized Schwann line with the loss of one NF1 allele were include in the network analysis to increase the sample number. Actually, from the multiple dimension reduction analysis, the transcriptional differences between PN cell lines and "normal" Schwann cells are not dramtically distinct. There is a cell line name discrepancy between the RNAseq data and drug screen data. 
