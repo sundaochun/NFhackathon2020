@@ -89,4 +89,4 @@ To rank the candidates, with the consideration of the above steps, we added the 
 * The R code can be found in /R Codes/DrugCandidates.R 
 * Docker image: https://hub.docker.com/repository/docker/sundaochun/hackathon2020rimage
 
-### This the first time for my to join Hackathon and share codes through Github. Please provide feedback and join the efforts ending the NF.   
+### This is my first time to join NFhackathon and share codes through Github. Please provide feedback and join the efforts ending the NF.   
