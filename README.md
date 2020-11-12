@@ -87,4 +87,5 @@ To rank the candidates, with the consideration of the above steps, we added the 
 * PN cell line transcriptomes and drug responses data are provided by NFhackathon2020 and downloaded from Synapse. Extra approval may be required to access the data.
 * "GSE41747_expVal.tsv" is downloaded from Synapse with ID:syn6130081 and "GSE41747_phenotype_data.tsv" is downloaded from Synapse with ID: syn6130082.
 * The R code can be found in /R Codes/DrugCandidates.R 
+* Docker image: https://hub.docker.com/repository/docker/sundaochun/hackathon2020rimage
 * This the first time for my to join Hackathon and share codes through Github. Please provide feedback and join the efforts ending the NF.   
