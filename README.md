@@ -1,6 +1,6 @@
 # NFhackathon2020
 ![logo!](/images/NF-Terminators.jpg "Logo")
-## Team NF-Terminators
+## Team NF Terminators
 
 #Integrated drug discovery using consensus gene regulatory networks and drug screen in plexiform neurofibromas 
 
