@@ -1,26 +1,8 @@
-library(dendextend)
-library(tidyverse) 
-library(synapser)
-library(umap) 
-library(dbscan)
-library(dplyr)
-library(pheatmap)
-library(synapser)
-library(WGCNA)
-library(ggplot2)
-library(ggdendro)
-library(gplots)
-library(biomaRt)
-library(org.Hs.eg.db)
-library(GOSemSim)
+BiocManager::install("WGCNA")
+BiocManager::install("ggdendro")
+BiocManager::install("gplots")
+BiocManager::install("GOSemSim")
 
-
-synLogin(email="@gmail.com", password="XXX")
-set.seed('99999')  #set seed for reproducibility
-
-
-#######################
-#Start analysis 
 
 library(synapser)
 library(dendextend)
@@ -47,7 +29,7 @@ library(GOSemSim)
 
 
 
-synLogin(email="sundaochun@gmail.com", password="NFhackxon2020")
+synLogin(email="xxx@gmail.com", password="xxx")
 set.seed('99999')
 
 ############################3
@@ -76,6 +58,8 @@ colnames(PNF.mx)==rownames(PNF.pdata)
 PNF.pdata<-new("AnnotatedDataFrame",data=PNF.pdata)
 PNF.eSet<-ExpressionSet(assayData=as.matrix(PNF.mx),phenoData=PNF.pdata,annotation="pnf_RNAseq")	
 
+library(limma)
+plotMDS(PNF.eSet, col=ifelse(PNF.eSet$modelOf=="normal","red","blue"))
 
 
 #Prepare the drug response data
@@ -117,11 +101,11 @@ targets <- synGet("syn17091507")$path %>% readRDS() %>%
   dplyr::select(internal_id, hugo_gene, std_name) %>% 
   distinct()
 
-#An abitrary cutoff was set as 50 for median_response, and it can be changed. 
+#An abitrary cutoff was set as "less than 50" for median_response, and it can be changed. 
 TraitsOfDrug <- drug_data_filt_1%>%dplyr::select(model_name,drug_name,response)%>%
   group_by(drug_name)%>%
   unique()%>%spread(model_name,response)%>%
-  filter(drug_name %in% drug_data_filt_2$drug_name[drug_data_filt_2$median_response<50])  
+  filter(drug_name %in% drug_data_filt_2$drug_name[drug_data_filt_2$AAUCddsf])  
 
 
 
@@ -144,7 +128,7 @@ rownames(datTraits)<-c("ipNF05.5 (mixed clone)","ipNF05.5 (single clone)","ipNF0
 datTraits<-datTraits[-c(3,5),] # "ipNF06.2A" and "ipNF95.11bC/T" don't have RNAseq data. 
 
 
-#To include the most available data in the RNAseq based network analysis and drug screen,
+#To include all available data in the RNAseq based network analysis and drug screen,
 #any plexiform neurofibromas related cells, which at least have lost one of the NF1 alleles were used in further analysis regardless the "normal" or "tumor" annotations.
 
 datExpr = as.data.frame(t(exprs(PNF.eSet[,sampleNames(PNF.eSet) %in% c("ipNF05.5 (mixed clone)","ipNF05.5 (single clone)", "ipNF95.11bC", "ipNF95.6", "ipnNF95.11c" )]))) #only 5 tumor lines have drug response data 
@@ -152,13 +136,16 @@ datExpr = as.data.frame(t(exprs(PNF.eSet[,sampleNames(PNF.eSet) %in% c("ipNF05.5
 mads=apply(datExpr,2,mad)
 hist(mads)
 
+#Expression data were trimmed for the next step to build scale free networks
 datExpr.test<-datExpr[,mads>1000]
 #write.table(t(datExpr.test),"NTAP.5pnf.filtered.txt", quote = FALSE, sep = "\t")
 
 #download the GSE41747 data set from Synapse 
 GSE41747 <- synGet("syn6130081")
 GEO<-read.table(GSE41747$path, header=TRUE,row.names=1,stringsAsFactors = FALSE,sep="\t")
-GEO.HU<-GEO[,17:29] # sample 17 to 29 are plexiform neurofibromas
+
+# sample 17 to 29 are plexiform neurofibromas
+GEO.HU<-GEO[,17:29]
 #write.table(GEO.HU,"GSE41747.HU.pNF.txt",quote=FALSE,sep = "\t")
 
 
@@ -172,7 +159,7 @@ NTAPm<-pNF.merged[,2:6]
 GEO41747m<-pNF.merged[,7:19]
 
 
-
+#~output folder is not writable.
 #setwd("~/output")
 
 setwd("/home/rstudio")
@@ -229,8 +216,8 @@ for (set in 1:nSets)
        xlab="", sub="", cex = 0.7)
 dev.off()
 
-
-multiExpr[[2]]$data = multiExpr[[2]]$data[-8, ]#remove GSM1023529 outlier
+#remove GSM1023529 outlier according the results in "ConsensusSampleClustering.pdf"
+multiExpr[[2]]$data = multiExpr[[2]]$data[-8, ]
 
 collectGarbage();
 # Check the size of the leftover data
@@ -265,8 +252,8 @@ for (set in 1:nSets)
   sampleTrees[[set]] = hclust(dist(multiExpr[[set]]$data), method = "average")
 }
 
+powers = c(seq(4,10,by=1), seq(12,20, by=2))
 
-powers = c(seq(4,10,by=1), seq(12,20, by=2));
 # Initialize a list to hold the results of scale-free analysis
 powerTables = vector(mode = "list", length = nSets);
 # Call the network topology analysis function for each set in turn
@@ -291,7 +278,7 @@ for (set in 1:nSets)
 }
 
 
-sizeGrWindow(8, 6)
+
 pdf(file = "Consensus.scaleFreeAnalysis.pdf", wi = 8, he = 6)
 par(mfcol = c(2,2));
 par(mar = c(4.2, 4.2 , 2.2, 0.5))
@@ -384,14 +371,14 @@ mp=modulePreservation(multiExpr,multiColor.test,referenceNetworks=1,verbose=3,ne
                       nPermutations=30,maxGoldModuleSize=100,maxModuleSize=400) 
 
 stats.con = mp$preservation$Z$ref.NTAP$inColumnsAlsoPresentIn.GEO 
-
-PreservedConNKs<-stats.con[order(-stats.con[,2]),c(1:2)]%>%filter(Zsummary.pres>7) # Zsummary from 10~7 is believed to be conservative according the package authors.  
+# Zsummary from 10~7 is believed to be conservative according the package manual.  
+PreservedConNKs<-stats.con[order(-stats.con[,2]),c(1:2)]%>%filter(Zsummary.pres>7)
 write.table(stats.con[order(-stats.con[,2]),c(1:2)],"NetworkConservationBetweenNTAPandGEO41747.txt",quote=FALSE,sep="\t")
 
 
 
 
-#
+#Use the drug response data as traits for the networks
 Traits = vector(mode="list", length = nSets)
 Traits[[1]]$data <-datTraits                
 Traits[[2]]$data <-datTraits
@@ -414,7 +401,7 @@ colnames(Color2NKs)[2]<-"NKs"
 
 rownames(moduleTraitCor[[1]])
 
-#The unclustered heapmap showing the correlation and p values
+#To generate a heapmap showing the correlation and p values
 pdf(file = "ModuleTraitRelationships-NTAPnew2.pdf", wi = 200, he = 7);
 # Plot the module-trait relationship table for set number 1
 set = 1
@@ -470,10 +457,6 @@ DrugClustDF<-data.frame(dend_data$labels)
 DrugClustDF$cluster<-"NA"
 
 
-
-################
-#These are drug_name that define the right boundary of DrugClusters. They are determined manually 
-#based on the heatmaps "moduleTraitCor.NTAP.inCon-test_lessdrug.pdf"
 BoundaryID<-c(
   "NCGC00346882.01",
   "NCGC00346646.01",
@@ -515,8 +498,6 @@ DrugCluster5<-DrugCandidates$EnzID[DrugCandidates$cluster=="DrugCluster5"]
 DrugCluster6<-DrugCandidates$EnzID[DrugCandidates$cluster=="DrugCluster6"]
 DrugCluster7<-DrugCandidates$EnzID[DrugCandidates$cluster=="DrugCluster7"]
 
-
-#Generate a list contains the EntrezID for each consensus networks between NTAP and GSE41747 from above analysis
 NTAP27nks<-data.frame(cbind(moduleColors.con,colnames(multiExpr[[1]]$data)))
 colnames(NTAP27nks)[2]<-"Symbol"
 NTAP27symbols <-NTAP27nks$Symbol%>%unique()
@@ -559,20 +540,23 @@ list4Comp[["DrugCluster7"]]<-DrugCluster7
 
 
 ###########################################################
-#each line of the below codes may need 5~20 min to complete       
+#each line of the below codes may need 5~30 min to complete       
 ##########################################################
 GOsimilarity.MF <-mclusterSim(list4Comp, semData=hsGO.MF, measure="Wang", combine="BMA")
-GOsimilarity.BP <-mclusterSim(list4Comp, semData=hsGO.BP, measure="Wang", combine="BMA")
-GOsimilarity.CC <-mclusterSim(list4Comp, semData=hsGO.CC, measure="Wang", combine="BMA")
 
 pdf(file = "GOsimilarity.MF.pdf", width= 10, height = 10)
 pheatmap(GOsimilarity.MF)
-dev.off()   
+dev.off() 
 
+
+GOsimilarity.BP <-mclusterSim(list4Comp, semData=hsGO.BP, measure="Wang", combine="BMA")
 pdf(file = "GOsimilarity.BP.pdf", width= 10, height = 10)              
 pheatmap(GOsimilarity.BP)
-dev.off()                         
+dev.off()  
 
+
+
+GOsimilarity.CC <-mclusterSim(list4Comp, semData=hsGO.CC, measure="Wang", combine="BMA")
 pdf(file = "GOsimilarity.CC.pdf", width= 10, height = 10)         
 pheatmap(GOsimilarity.CC)     
 dev.off()
@@ -613,7 +597,3 @@ write.table(DrugNKsCandidate.refine,"DrugNKsCandidate.refine.txt", quote=FALSE,s
 drug_data_filt_2$drug_name<-gsub("-",".",drug_data_filt_2$drug_name)
 DrugNKsCandidate.refine2<-DrugNKsCandidate.refine%>%left_join(drug_data_filt_2,by=c("label"="drug_name"))%>%left_join(finalAnno,by=c("label"="drug_name"))
 write.table(DrugNKsCandidate.refine2,"DrugNKsCandidate.refine2.txt", quote=FALSE,sep="\t")  
-
-
-
-
