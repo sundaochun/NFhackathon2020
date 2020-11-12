@@ -82,8 +82,9 @@ To rank the candidates, with the consideration of the above steps, we added the 
 #### 2. The genetic information such as Exome and SNP data were not used in the current analysis because 1) there are limited sample numbers in PN to statistically significant, 2) the PN has been reported to have low mutation burdens, suggesting the individual mutation or SNPs may not significantly influence the tumor biology and drug responses, 3) the principle of this analysis is to identify the preserved networks among both cell lines and tumors, which decreases the weight of gene mutations with in each sample. However, it doesn't mean the mutations are not important in drug responses, and it can be tackled given more time and available samples. 
 
 #### 3. What the next steps to select the candidate drugs for the best potentials for preclinical study?
-* Weighted toxicity scores of the drugs currently under or evaluated by the clinical trials can be integrated into the ranking (PMID: 29739789).
-* Many candidates have been approved by the FDA in other diseases. The FDA drug label database can be used to consider the combination of different FDA approved drugs to reduce the potential toxicities and side effects in future PN preclinical trials. 
+* Factor in the weighted toxicity scores
+* Use FDA drug label database to design a combination of candidates 
+* MPNST drug screen can be integrated for candidates to inhibit both 
 
 #### 4. Reproduction: 
 * PN cell line transcriptomes and drug responses data are provided by NFhackathon2020 and downloaded from Synapse. Extra approval may be required to access the data.
