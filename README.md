@@ -17,7 +17,7 @@
 ## Methods
 
 ### Data
-We used RNA-Seq data of the tumor cell lines in drug screen provided by NFhackathon2020 from synapse and a public PN tissue data (GEO41747) from synapse. 
+We used RNA-Seq data of the tumor cell lines in drug screen provided by NFhackathon2020 from synapse and a public PN tissue data (GSE41747) from synapse. 
 
 ### Data processing and visualization 
 The transcriptomes from different sources were trimed and merged. WGCNA package was used for the network analysis and GOSemSim package was used for GO sematic analysis in R environment. 
