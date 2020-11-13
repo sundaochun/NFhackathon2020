@@ -1,6 +1,6 @@
 # NFhackathon2020
 ![logo!](/images/NF-Terminators.jpg "Logo")
-## Team NF Terminators
+## Team: NF Terminators
 
 #Gene network-based drug discovery in plexiform neurofibromas 
 
