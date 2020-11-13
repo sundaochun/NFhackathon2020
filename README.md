@@ -90,6 +90,6 @@ To rank the candidates, with the consideration of the above steps, we added the 
 * PN cell line transcriptomes and drug responses data are provided by NFhackathon2020 and downloaded from Synapse. Extra approval may be required to access the data.
 * "GSE41747_expVal.tsv" is downloaded from Synapse with ID:syn6130081 and "GSE41747_phenotype_data.tsv" is downloaded from Synapse with ID: syn6130082.
 * The R code can be found in /R Codes/DrugCandidates.R 
-* Docker image: https://hub.docker.com/repository/docker/sundaochun/daochunproject
+* Docker image: https://hub.docker.com/repository/docker/sundaochun/daochunproject  Note: the docker image crashes at line 545 when I test it on a iMac pro (2017) with MacOS10.14.6, but smoothly on a PC server running windows10. Line 545,546 and 547 require huge compuatation resource and could take ~one hour to finish. The R code can run smoothly in Rstudo Version 1.2.5033 with R-4.0.2 on both of computers without the docker container. 
 
 ### This is my first time to join NFhackathon and share codes through Github. Please provide feedback and join the efforts ending the NF.   
