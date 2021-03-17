@@ -63,8 +63,7 @@ The correlation heatmap under the MF branch is demonstrated below. We can see th
 ![GOsimilarity.MF.score!](/images/DrugNetworkScores.jpg "GOsimilarity.score.MF")
 
 ### Step 6: Rank the drug candidates considering the responses, correlation with the preserved networks, and known drug targets/mechanisms
-To rank the candidates, with the consideration of the above steps, we added the weight to the drugs with known targets that the more targets the drug has, the higher it may rank. We did so because the drugs with known targets were relatively well-studied and even approved by the FDA in different diseases, making the potential toxicity, preclinical experiment design, and mechanism studies more efficient. The code is also easy to be tweaked to prioritize the new drug candidates, and our analysis in Step 3,4 and 5 will extraordinarily helpful for the identification of potential targeted genes or networks. The top 10 candidates are shown below. Surprisingly, the sunitinib ranks the first, which is the first approved drug for PN by FDA this year.
-
+To rank the candidates, with the consideration of the above steps, we added the weight to the drugs with known targets that the more targets the drug has, the higher it may rank. We did so because the drugs with known targets were relatively well-studied and even approved by the FDA in different diseases, making the potential toxicity, preclinical experiment design, and mechanism studies more efficient. The code is also easy to be tweaked to prioritize the new drug candidates, and our analysis in Step 3,4 and 5 will extraordinarily helpful for the identification of potential targeted genes or networks. The top 10 candidates are shown below. 
 ![Top10Rank!](/images/Rank.jpg "Top10Rank")
 
 
