@@ -68,7 +68,7 @@ To rank the candidates, with the consideration of the above steps, we added the 
 
 
 ## Conclusion/Discussion:
-* Our strategy works efficiently to rank the candiates, and the top candidate, SUNITINIB, is the first FDA approved drug on PN.
+* Our strategy works efficiently to rank the candiates.
 * Using the preserved networks, we enrich candidates targeting both cells and tumors.
 * The algorithm currently weights higher on the “well-annotated” drug candidates and can be tweaked to identify novel candidates.
 * The gene networks can help researchers to nail down the mechanisms.
